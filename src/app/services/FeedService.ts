@@ -1890,6 +1890,7 @@ export class FeedService {
       FeedsData.PostCommentStatus.available,
     );
     this.dataHelper.updatePost(key, post);
+    this.dataHelper.receiveNewPost();
 
     let nodeChannelId = this.getChannelId(nodeId, channel_id);
     this.updateLastPostUpdate(nodeChannelId, nodeId, channel_id, updateAt);
@@ -2986,9 +2987,11 @@ export class FeedService {
 
       this.dataHelper.updatePost(key, post);
 
+
       if (requestAction == FeedsData.RequestAction.defaultAction) {
         let key = this.getChannelId(nodeId, channel_id);
         this.updateLastPostUpdate(key, nodeId, channel_id, updatedAt);
+        this.dataHelper.receiveNewPost();
       }
 
       if (this.getServerVersionCodeByNodeId(nodeId) < newCommentVersion) {

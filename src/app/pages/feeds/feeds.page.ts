@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { PopoverController } from '@ionic/angular';
 import { FeedService } from '../../services/FeedService';
 import { ThemeService } from '../../services/theme.service';
 import { PopupProvider } from '../../services/popup';
+import { DataHelper } from '../../services/DataHelper';
 import { Events } from 'src/app/services/events.service';
 
 import _ from 'lodash';
@@ -14,6 +15,7 @@ import _ from 'lodash';
 })
 export class FeedsPage implements OnInit {
   public totalunread: number = 0;
+  public newPostCount: number = 0;
   public title = '';
   public currentTab = '';
   public popover: any = '';
@@ -23,6 +25,8 @@ export class FeedsPage implements OnInit {
     public theme: ThemeService,
     private event: Events,
     public popupProvider: PopupProvider,
+    private dataHelper: DataHelper,
+    private zone: NgZone
   ) {}
 
   ngOnInit() {}
@@ -50,6 +54,14 @@ export class FeedsPage implements OnInit {
     this.event.subscribe(FeedsEvent.PublishType.UpdateNotification, () => {
       this.getUnReadNum();
     });
+
+    this.newPostCount = this.dataHelper.getNewPostCount();
+    this.event.subscribe(FeedsEvent.PublishType.receiveNewPost, () => {
+      this.zone.run(() => {
+        this.newPostCount = this.dataHelper.getNewPostCount();
+        console.log("newPostCount is", this.newPostCount)
+      });
+    })
   }
 
   ionViewWillLeave() {
@@ -59,6 +71,7 @@ export class FeedsPage implements OnInit {
       this.popover = '';
     }
     this.event.unsubscribe(FeedsEvent.PublishType.UpdateNotification);
+    this.event.unsubscribe(FeedsEvent.PublishType.receiveNewPost);
   }
 
   ionViewDidEnter() {

@@ -34,6 +34,8 @@ import { NFTContractHelperService, SortType } from 'src/app/services/nftcontract
 import _ from 'lodash';
 import { Logger } from 'src/app/services/logger';
 import { HttpService } from '../../../services/HttpService';
+import { DataHelper } from 'src/app/services/DataHelper';
+
 let TAG: string = 'Feeds-home';
 @Component({
   selector: 'app-home',
@@ -168,7 +170,8 @@ export class HomePage implements OnInit {
     private nftPersistenceHelper: NFTPersistenceHelper,
     private walletConnectControllerService: WalletConnectControllerService,
     private nftContractHelperService: NFTContractHelperService,
-    private httpService: HttpService
+    private httpService: HttpService,
+    private dataHelper: DataHelper
   ) { }
 
   initPostListData(scrollToTop: boolean) {
@@ -190,6 +193,7 @@ export class HomePage implements OnInit {
     this.isLoadVideoiamge = {};
     this.refreshImage(0);
     this.initnodeStatus(this.postList);
+    this.dataHelper.resetNewPost();
   }
 
   sortPostList() {
@@ -223,6 +227,7 @@ export class HomePage implements OnInit {
     this.isLoadVideoiamge = {};
     this.refreshImage(0);
     this.initnodeStatus(this.postList);
+    this.dataHelper.resetNewPost();
   }
 
   addConnectionChangedEvent() {
@@ -308,11 +313,11 @@ export class HomePage implements OnInit {
     this.events.subscribe(FeedsEvent.PublishType.updateTab, isInit => {
       this.zone.run(() => {
         this.hideDeletedPosts = this.feedService.getHideDeletedPosts();
-        if (isInit) {
-          this.initPostListData(true);
-          return;
-        }
-        this.refreshPostList();
+        // if (isInit) {
+        //   this.initPostListData(true);
+        //   return;
+        // }
+        // this.refreshPostList();
       });
     });
 
@@ -352,9 +357,7 @@ export class HomePage implements OnInit {
   }
 
   addCommonEvents() {
-
-    this.events.subscribe(FeedsEvent.PublishType.clickHome,()=>{
-
+    this.events.subscribe(FeedsEvent.PublishType.clickHome, () => {
       this.content.getScrollElement().then((ponit:any)=>{
             if(ponit.scrollTop>110){
               this.initPostListData(true);
@@ -933,34 +936,37 @@ export class HomePage implements OnInit {
     switch (this.tabType) {
       case 'feeds':
         let sId = setTimeout(() => {
-          this.images = {};
-          // this.infiniteScroll.disabled = false;
-          this.startIndex = 0;
-          this.totalData = this.sortPostList();
-          if (this.totalData.length - this.pageNumber > 0) {
-            this.zone.run(() => {
-              this.postList = this.totalData.slice(0, this.pageNumber);
-              this.startIndex++;
-              // this.infiniteScroll.disabled = false;
-              this.isLoadimage = {};
-              this.isLoadVideoiamge = {};
-              this.refreshImage(0);
-              this.initnodeStatus(this.postList);
-              if (event != null) event.target.complete();
-              this.refreshEvent = null;
-            });
-          } else {
-            this.zone.run(() => {
-              this.postList = this.totalData;
-              // this.infiniteScroll.disabled = true;
-              this.isLoadimage = {};
-              this.isLoadVideoiamge = {};
-              this.refreshImage(0);
-              this.initnodeStatus(this.postList);
-              if (event != null) event.target.complete();
-              this.refreshEvent = null;
-            });
-          }
+          this.initPostListData(true);
+          // this.images = {};
+          // // this.infiniteScroll.disabled = false;
+          // this.startIndex = 0;
+          // this.totalData = this.sortPostList();
+          // if (this.totalData.length - this.pageNumber > 0) {
+          //   this.zone.run(() => {
+          //     this.postList = this.totalData.slice(0, this.pageNumber);
+          //     this.startIndex++;
+          //     // this.infiniteScroll.disabled = false;
+          //     this.isLoadimage = {};
+          //     this.isLoadVideoiamge = {};
+          //     this.refreshImage(0);
+          //     this.initnodeStatus(this.postList);
+          //     if (event != null) event.target.complete();
+          //     this.refreshEvent = null;
+          //   });
+          // } else {
+          //   this.zone.run(() => {
+          //     this.postList = this.totalData;
+          //     // this.infiniteScroll.disabled = true;
+          //     this.isLoadimage = {};
+          //     this.isLoadVideoiamge = {};
+          //     this.refreshImage(0);
+          //     this.initnodeStatus(this.postList);
+          //     if (event != null) event.target.complete();
+          //     this.refreshEvent = null;
+          //   });
+          // }
+          if (event != null) event.target.complete();
+          this.refreshEvent = null;
           clearTimeout(sId);
         }, 500);
         break;
@@ -1828,7 +1834,7 @@ export class HomePage implements OnInit {
     switch (type) {
       case 'feeds':
         this.infiniteScroll.disabled = false;
-        this.refreshPostList();
+        // this.refreshPostList();
         break;
       case 'pasar':
         this.getElaUsdPrice();

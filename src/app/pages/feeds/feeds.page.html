@@ -4,6 +4,7 @@
   <ion-tab-bar class="tabs-div" >
     <ion-tab-button tab="home" (click)="home()">
         <img class="home-tab" [ngClass]="{'home-tab-selected': currentTab == 'home'}">
+        <ion-badge color="danger" class="totalunread" *ngIf="newPostCount>0">{{newPostCount}}</ion-badge>
     </ion-tab-button>
 
     <ion-tab-button tab="profile" (click)="profile()">

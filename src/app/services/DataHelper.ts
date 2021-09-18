@@ -5,6 +5,8 @@ import * as _ from 'lodash';
 import { UtilService } from './utilService';
 import { Config } from './config';
 import { SignInData } from './FeedService';
+import { Events } from 'src/app/services/events.service';
+
 let TAG: string = 'DataHelper';
 
 @Injectable()
@@ -101,8 +103,11 @@ export class DataHelper {
 
   private apiProvider: string = 'elastos.io';
 
+  private newPostCount: number = 0;
+
   constructor(
     private storageService: StorageService,
+    private events: Events
   ) {}
 
   ////subscribedChannelsMap
@@ -2394,5 +2399,22 @@ export class DataHelper {
         reject(err);
       }
     });
+  }
+
+  //newPostCount
+  receiveNewPost() {
+    this.newPostCount++;
+    console.log("receiveNewPost", this.newPostCount);
+    this.events.publish(FeedsEvent.PublishType.receiveNewPost, this.newPostCount);
+  }
+
+  getNewPostCount() {
+    return this.newPostCount
+  }
+
+  resetNewPost() {
+    this.newPostCount = 0;
+    console.log("resetNewPost", this.newPostCount);
+    this.events.publish(FeedsEvent.PublishType.receiveNewPost, this.newPostCount);
   }
 }
